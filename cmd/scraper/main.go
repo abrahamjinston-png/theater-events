@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abrahamjinston-png/ukrainian-theater-events/internal/logger"
-	s3storage "github.com/abrahamjinston-png/ukrainian-theater-events/internal/storage/s3"
+	"github.com/abrahamjinston-png/theater-events/internal/logger"
+	s3storage "github.com/abrahamjinston-png/theater-events/internal/storage/s3"
 	"github.com/chromedp/chromedp"
 )
 

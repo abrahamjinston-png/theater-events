@@ -1,0 +1,46 @@
+name: Scrape Franko Theater
+
+on:
+  schedule:
+    # Working days (Mon-Fri), 09:00–17:59 Kyiv
+    # Kyiv is UTC+3 currently → 06:00–14:59 UTC
+    - cron: '*/4 6-14 * * 1-5'
+
+    # All other times — every 2 hours
+    # Weekdays outside 09–17 Kyiv
+    - cron: '0 0,2,4,16,18,20,22 * * 1-5'
+
+    # Weekends — every 2 hours all day
+    - cron: '0 */2 * * 0,6'
+
+  workflow_dispatch:
+
+env:
+  GO_VERSION_FILE: go.mod
+  AWS_REGION: eu-north-1
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ env.GO_VERSION_FILE }}
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Run scraper
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          SCRAPER_BUCKET: ${{ secrets.SCRAPER_BUCKET }}
+        run: go run ./cmd/scraper

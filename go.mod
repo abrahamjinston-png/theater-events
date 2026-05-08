@@ -1,4 +1,4 @@
-module github.com/greg-source/ukrainian-theater-events
+module github.com/abrahamjinston-png/theater-events
 
 go 1.26
 

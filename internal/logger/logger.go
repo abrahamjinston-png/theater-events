@@ -1,35 +1,28 @@
 package logger
 
 import (
-	"fmt"
-	"log"
+	"context"
+	"log/slog"
 	"os"
 )
 
-var std = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.Llongfile)
+var std = slog.New(slog.NewJSONHandler(os.Stderr, nil))
 
-// Infof logs an informational message.
-func Infof(format string, args ...any) {
-	std.Output(2, "[INFO] "+fmt.Sprintf(format, args...))
+// Info logs at INFO.
+func Info(msg string, attrs ...slog.Attr) {
+	std.LogAttrs(context.Background(), slog.LevelInfo, msg, attrs...)
 }
 
-// Debugf logs a debug message.
-func Debugf(format string, args ...any) {
-	std.Output(2, "[DEBUG] "+fmt.Sprintf(format, args...))
+// Error logs at ERROR, recording err under "err". err may be nil.
+func Error(msg string, err error, attrs ...slog.Attr) {
+	if err != nil {
+		attrs = append(attrs, slog.String("err", err.Error()))
+	}
+	std.LogAttrs(context.Background(), slog.LevelError, msg, attrs...)
 }
 
-// Warnf logs a warning message.
-func Warnf(format string, args ...any) {
-	std.Output(2, "[WARN] "+fmt.Sprintf(format, args...))
-}
-
-// Errorf logs an error message.
-func Errorf(format string, args ...any) {
-	std.Output(2, "[ERROR] "+fmt.Sprintf(format, args...))
-}
-
-// Fatalf logs a fatal message and exits the process.
-func Fatalf(format string, args ...any) {
-	std.Output(2, "[FATAL] "+fmt.Sprintf(format, args...))
+// Fatal logs at ERROR and exits the process.
+func Fatal(msg string, err error, attrs ...slog.Attr) {
+	Error(msg, err, attrs...)
 	os.Exit(1)
 }
